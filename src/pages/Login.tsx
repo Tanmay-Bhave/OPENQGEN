@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Shield, Sparkles, CheckCircle } from "lucide-react";
 import { useApp } from "../context/AppContext";
+import { loginRequest } from "../Api/authApi";
 
 
 export default function Login() {
@@ -24,27 +25,10 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const data = await loginRequest(email, password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Invalid email or password");
-        return;
-      }
-
-      // Save authentication data
+      // Persist authentication before routing, so a refresh preserves the session.
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
 
       // Update application context
       login(data.user);
@@ -55,23 +39,11 @@ export default function Login() {
       } else {
         navigate("faculty/dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      setError(
-        "Unable to connect to server. Please make sure the backend is running."
-      );
+      setError(error.message || "Unable to connect to server. Please make sure the backend is running.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const demoLogin = (role: "admin" | "faculty") => {
-    if (role === "admin") {
-      setEmail("admin@openqg.com");
-      setPassword("Admin@123");
-    } else {
-      setEmail("rahul.sharma@college.edu");
-      setPassword("Faculty@123");
     }
   };
 
@@ -216,26 +188,6 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Demo credentials */}
-            <div className="mt-4 bg-slate-50 rounded-xl p-4">
-              <p className="text-xs font-600 text-slate-500 uppercase tracking-wide mb-3">Demo Quick Login</p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => demoLogin("admin")}
-                  className="flex-1 text-xs py-2 px-3 bg-indigo-50 text-indigo-700 rounded-lg font-500 hover:bg-indigo-100 transition-colors border border-indigo-200"
-                >
-                  Admin Demo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => demoLogin("faculty")}
-                  className="flex-1 text-xs py-2 px-3 bg-green-50 text-green-700 rounded-lg font-500 hover:bg-green-100 transition-colors border border-green-200"
-                >
-                  Faculty Demo
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>

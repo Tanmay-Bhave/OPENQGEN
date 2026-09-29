@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
-import { departments } from "../../data/mock";
+import { departments } from "../../data/runtime";
 
 export default function Settings() {
   const { toast } = useApp();

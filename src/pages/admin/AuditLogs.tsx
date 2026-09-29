@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Shield, User } from "lucide-react";
-import { auditLogs } from "../../data/mock";
+import { auditLogs } from "../../data/runtime";
 import Badge from "../../components/ui/Badge";
 
 export default function AuditLogs() {

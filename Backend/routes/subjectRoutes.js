@@ -17,21 +17,11 @@ const router = express.Router();
 
 
 // Get all subjects
-router.get(
-  "/",
-  protect,
-  adminOnly,
-  getSubjects
-);
+router.get("/", protect, getSubjects);
 
 
 // Get single subject
-router.get(
-  "/:id",
-  protect,
-  adminOnly,
-  getSubjectById
-);
+router.get("/:id", protect, getSubjectById);
 
 
 // Create subject

@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useReducer, useCallback } from "react";
+import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react";
 import type { User, Page, NavParams, Faculty, QuestionPaper } from "../types";
-import { faculties as initialFaculties, questionPapers as initialPapers } from "../data/mock";
+import { getFaculties } from "../Api/facultyApi";
 
 interface Toast {
   id: string;
@@ -23,17 +23,27 @@ type Action =
   | { type: "NAVIGATE"; page: Page; params?: NavParams }
   | { type: "TOAST"; toast: Toast }
   | { type: "REMOVE_TOAST"; id: string }
-  | { type: "ADD_FACULTY"; faculty: Faculty }
-  | { type: "UPDATE_FACULTY"; faculty: Faculty }
-  | { type: "UPDATE_PAPER"; paper: QuestionPaper };
+  | { type: "SET_FACULTIES"; faculties: Faculty[] };
 
+function storedUser(): User | null {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) as User : null;
+  } catch {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    return null;
+  }
+}
+
+const persistedUser = storedUser();
 const initialState: AppState = {
-  user: null,
-  page: "login",
+  user: persistedUser,
+  page: persistedUser ? (persistedUser.role === "admin" ? "admin/dashboard" : "faculty/dashboard") : "login",
   params: {},
   toasts: [],
-  faculties: initialFaculties,
-  papers: initialPapers,
+  faculties: [],
+  papers: [],
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -48,18 +58,8 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, toasts: [...state.toasts, action.toast] };
     case "REMOVE_TOAST":
       return { ...state, toasts: state.toasts.filter((t) => t.id !== action.id) };
-    case "ADD_FACULTY":
-      return { ...state, faculties: [...state.faculties, action.faculty] };
-    case "UPDATE_FACULTY":
-      return {
-        ...state,
-        faculties: state.faculties.map((f) => (f.id === action.faculty.id ? action.faculty : f)),
-      };
-    case "UPDATE_PAPER":
-      return {
-        ...state,
-        papers: state.papers.map((p) => (p.id === action.paper.id ? action.paper : p)),
-      };
+    case "SET_FACULTIES":
+      return { ...state, faculties: action.faculties };
     default:
       return state;
   }
@@ -70,8 +70,7 @@ interface AppContextValue extends AppState {
   logout: () => void;
   login: (user: User) => void;
   toast: (type: Toast["type"], message: string) => void;
-  addFaculty: (faculty: Faculty) => void;
-  updateFaculty: (faculty: Faculty) => void;
+  refreshFaculties: () => Promise<void>;
   updatePaper: (paper: QuestionPaper) => void;
 }
 
@@ -80,25 +79,34 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const refreshFaculties = useCallback(async () => {
+    if (state.user?.role !== "admin") return;
+    try {
+      const data = await getFaculties();
+      dispatch({ type: "SET_FACULTIES", faculties: data.map((f: any) => ({ ...f, id: f.id || f._id, assignedSubjects: [], password: "", lastLogin: f.lastLogin ? new Date(f.lastLogin).toLocaleString() : "Never", createdDate: f.createdAt ? new Date(f.createdAt).toLocaleDateString() : "" })) });
+    } catch { /* individual pages show request errors for their own resources */ }
+  }, [state.user?.role]);
+  useEffect(() => { refreshFaculties(); }, [refreshFaculties]);
+
   const navigate = useCallback((page: Page, params?: NavParams) => {
     dispatch({ type: "NAVIGATE", page, params });
   }, []);
 
-  const logout = useCallback(() => dispatch({ type: "LOGOUT" }), []);
-  const login = useCallback((user: User) => dispatch({ type: "LOGIN", user }), []);
+  const logout = useCallback(() => { localStorage.removeItem("token"); localStorage.removeItem("user"); dispatch({ type: "LOGOUT" }); }, []);
+  const login = useCallback((user: User) => { localStorage.setItem("user", JSON.stringify(user)); dispatch({ type: "LOGIN", user }); }, []);
 
   const toast = useCallback((type: Toast["type"], message: string) => {
     const id = Math.random().toString(36).slice(2);
     dispatch({ type: "TOAST", toast: { id, type, message } });
     setTimeout(() => dispatch({ type: "REMOVE_TOAST", id }), 4000);
   }, []);
+  const updatePaper = useCallback((_paper: QuestionPaper) => {
+    dispatch({ type: "TOAST", toast: { id: "paper-api-required", type: "error", message: "Question-paper storage is not available on the backend." } });
+  }, []);
 
-  const addFaculty = useCallback((faculty: Faculty) => dispatch({ type: "ADD_FACULTY", faculty }), []);
-  const updateFaculty = useCallback((faculty: Faculty) => dispatch({ type: "UPDATE_FACULTY", faculty }), []);
-  const updatePaper = useCallback((paper: QuestionPaper) => dispatch({ type: "UPDATE_PAPER", paper }), []);
 
   return (
-    <AppContext.Provider value={{ ...state, navigate, logout, login, toast, addFaculty, updateFaculty, updatePaper }}>
+    <AppContext.Provider value={{ ...state, navigate, logout, login, toast, refreshFaculties, updatePaper }}>
       {children}
     </AppContext.Provider>
   );

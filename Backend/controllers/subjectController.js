@@ -8,7 +8,8 @@ const User = require("../models/User");
 
 const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find()
+    const filter = req.user.role === "faculty" ? { assignedFaculty: req.user.id } : {};
+    const subjects = await Subject.find(filter)
       .populate(
         "assignedFaculty",
         "name email department designation facultyId"
@@ -37,7 +38,7 @@ const getSubjects = async (req, res) => {
 
 const getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id).populate(
+    const subject = await Subject.findOne(req.user.role === "faculty" ? { _id: req.params.id, assignedFaculty: req.user.id } : { _id: req.params.id }).populate(
       "assignedFaculty",
       "name email department designation facultyId"
     );

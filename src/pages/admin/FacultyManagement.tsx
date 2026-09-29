@@ -12,12 +12,13 @@ import { useApp } from "../../context/AppContext";
 import Badge, { StatusBadge } from "../../components/ui/Badge";
 import Modal from "../../components/ui/Modal";
 import { ConfirmDialog } from "../../components/ui/Modal";
-import { departments } from "../../data/mock";
 import type { Faculty } from "../../types";
+
+const departments = ["Information Technology", "Computer Science Engineering", "Electronics & Communication", "Mechanical Engineering", "Civil Engineering"];
 
 
 function AddFacultyModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { addFaculty, toast } = useApp();
+  const { refreshFaculties, toast } = useApp();
   const [form, setForm] = useState({
     name: "", facultyId: "", email: "", password: "", department: "",
     designation: "", phone: "", employeeCode: "",
@@ -26,20 +27,9 @@ function AddFacultyModal({ open, onClose }: { open: boolean; onClose: () => void
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!form.name || !form.email || !form.password || !form.department) return;
-    const faculty: Faculty = {
-      id: Math.random().toString(36).slice(2),
-      facultyId: form.facultyId || `FAC${String(Math.floor(Math.random() * 900 + 100))}`,
-      name: form.name, email: form.email, password: form.password,
-      department: form.department, designation: form.designation || "Assistant Professor",
-      phone: form.phone, employeeCode: form.employeeCode,
-      status: "Active", lastLogin: "Never", createdDate: new Date().toLocaleDateString("en-IN"),
-      assignedSubjects: [],
-    };
-    addFaculty(faculty);
-    setDone(true);
-    toast("success", "Faculty account created successfully.");
+    try { await createFaculty(form); await refreshFaculties(); setDone(true); toast("success", "Faculty account created successfully."); } catch (error: any) { toast("error", error.message); }
   };
 
   const handleClose = () => { setDone(false); setForm({ name:"",facultyId:"",email:"",password:"",department:"",designation:"",phone:"",employeeCode:"" }); onClose(); };
@@ -121,7 +111,7 @@ function AddFacultyModal({ open, onClose }: { open: boolean; onClose: () => void
 }
 
 function CredentialsModal({ faculty, open, onClose }: { faculty: Faculty | null; open: boolean; onClose: () => void }) {
-  const { toast, updateFaculty } = useApp();
+  const { toast, refreshFaculties } = useApp();
   const [showPw, setShowPw] = useState(false);
   const [newPw, setNewPw] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
@@ -159,9 +149,7 @@ function CredentialsModal({ faculty, open, onClose }: { faculty: Faculty | null;
             className="btn-primary flex-1 justify-center"
             disabled={!newPw}
             onClick={() => {
-              updateFaculty({ ...faculty, password: newPw });
-              toast("success", "Password updated successfully.");
-              setNewPw(""); onClose();
+              updateFacultyPassword(faculty.id, newPw).then(() => { toast("success", "Password updated successfully."); setNewPw(""); onClose(); }).catch((e) => toast("error", e.message));
             }}
           >
             Update Password
@@ -173,9 +161,7 @@ function CredentialsModal({ faculty, open, onClose }: { faculty: Faculty | null;
         <button
           className="w-full btn-secondary justify-center text-slate-600"
           onClick={() => {
-            updateFaculty({ ...faculty, status: faculty.status === "Active" ? "Inactive" : "Active" });
-            toast("info", `Account ${faculty.status === "Active" ? "deactivated" : "activated"}.`);
-            onClose();
+            updateFacultyStatus(faculty.id, faculty.status === "Active" ? "Inactive" : "Active").then(() => { refreshFaculties(); toast("info", `Account ${faculty.status === "Active" ? "deactivated" : "activated"}.`); onClose(); }).catch((e) => toast("error", e.message));
           }}
         >
           {faculty.status === "Active" ? "Deactivate Account" : "Activate Account"}
@@ -195,18 +181,21 @@ function CredentialsModal({ faculty, open, onClose }: { faculty: Faculty | null;
 }
 
 export default function FacultyManagement() {
-  const { faculties, navigate } = useApp();
+  const { faculties, navigate, toast, refreshFaculties } = useApp();
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showAdd, setShowAdd] = useState(false);
   const [credFaculty, setCredFaculty] = useState<Faculty | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Faculty | null>(null);
-  const { toast } = useApp();
 
   const filtered = faculties.filter((f) => {
-    const matchSearch = f.name.toLowerCase().includes(search.toLowerCase()) || f.email.toLowerCase().includes(search.toLowerCase()) || f.facultyId.toLowerCase().includes(search.toLowerCase());
-    const matchDept = deptFilter === "All" || f.department === deptFilter;
+const searchTerm = search.toLowerCase();
+
+const matchSearch =
+  (f.name || "").toLowerCase().includes(searchTerm) ||
+  (f.email || "").toLowerCase().includes(searchTerm) ||
+  (f.facultyId || "").toLowerCase().includes(searchTerm);    const matchDept = deptFilter === "All" || f.department === deptFilter;
     const matchStatus = statusFilter === "All" || f.status === statusFilter;
     return matchSearch && matchDept && matchStatus;
   });
@@ -286,7 +275,7 @@ export default function FacultyManagement() {
                   </td>
                   <td className="text-slate-600">{f.email}</td>
                   <td>
-                    <Badge variant="info" size="sm">{f.department.length > 22 ? f.department.slice(0,20)+"…" : f.department}</Badge>
+                    <Badge variant="info" size="sm">{(f.department || "").length > 22 ? (f.department || "").slice(0,20)+"…" : f.department}</Badge>
                   </td>
                   <td>
                     <span className="text-slate-600">{f.assignedSubjects.length} Subject{f.assignedSubjects.length !== 1 ? "s" : ""}</span>
@@ -321,7 +310,7 @@ export default function FacultyManagement() {
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => { toast("success", `${deleteTarget?.name}'s account has been deleted.`); }}
+        onConfirm={() => { if (deleteTarget) deleteFaculty(deleteTarget.id).then(() => { refreshFaculties(); setDeleteTarget(null); toast("success", `${deleteTarget.name}'s account has been deleted.`); }).catch((e) => toast("error", e.message)); }}
         title="Delete Faculty Account?"
         message={`This will permanently delete ${deleteTarget?.name}'s account and all associated data. This action cannot be undone.`}
         confirmLabel="Delete Faculty"

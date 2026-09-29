@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { StatusBadge } from "../../components/ui/Badge";
-import { subjects, questionPapers } from "../../data/mock";
+import { subjects, questionPapers } from "../../data/runtime";
 
 const tabs = ["Profile", "Credentials", "Assigned Subjects", "Generated Papers", "Activity"];
 

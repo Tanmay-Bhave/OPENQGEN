@@ -1,143 +1,17 @@
-const API_URL = "http://localhost:5000/api/faculty";
-
-function getHeaders() {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-}
+import { request, toId } from "./client";
 
 export async function getFaculties() {
-  const response = await fetch(API_URL, {
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch faculty");
-  }
-
-  return data.faculties;
+  return (await request<{ faculty: any[] }>("/faculty")).faculty.map(toId);
 }
-
-export async function getFaculty(id: string) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch faculty");
-  }
-
-  return data.faculty;
+export async function getFaculty(id: string) { return toId(await request<any>(`/faculty/${id}`)); }
+export async function createFaculty(faculty: { name: string; facultyId?: string; employeeCode?: string; email: string; password: string; department: string; designation?: string; phone?: string }) {
+  return toId((await request<{ faculty: any }>("/faculty", { method: "POST", body: JSON.stringify(faculty) })).faculty);
 }
-
-export async function createFaculty(faculty: {
-  name: string;
-  facultyId?: string;
-  employeeCode?: string;
-  email: string;
-  password: string;
-  department: string;
-  designation?: string;
-  phone?: string;
-}) {
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify(faculty),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to create faculty");
-  }
-
-  return data.faculty;
+export async function updateFaculty(id: string, faculty: { name?: string; facultyId?: string; employeeCode?: string; email?: string; department?: string; designation?: string; phone?: string }) {
+  return toId((await request<{ faculty: any }>(`/faculty/${id}`, { method: "PUT", body: JSON.stringify(faculty) })).faculty);
 }
-
-export async function updateFaculty(
-  id: string,
-  faculty: {
-    name?: string;
-    facultyId?: string;
-    employeeCode?: string;
-    email?: string;
-    department?: string;
-    designation?: string;
-    phone?: string;
-  }
-) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: getHeaders(),
-    body: JSON.stringify(faculty),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update faculty");
-  }
-
-  return data.faculty;
+export async function updateFacultyStatus(id: string, status: "Active" | "Inactive") {
+  return toId((await request<{ faculty: any }>(`/faculty/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) })).faculty);
 }
-
-export async function updateFacultyStatus(
-  id: string,
-  status: "Active" | "Inactive"
-) {
-  const response = await fetch(`${API_URL}/${id}/status`, {
-    method: "PATCH",
-    headers: getHeaders(),
-    body: JSON.stringify({ status }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update status");
-  }
-
-  return data.faculty;
-}
-
-export async function updateFacultyPassword(
-  id: string,
-  password: string
-) {
-  const response = await fetch(`${API_URL}/${id}/password`, {
-    method: "PATCH",
-    headers: getHeaders(),
-    body: JSON.stringify({ password }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update password");
-  }
-
-  return data;
-}
-
-export async function deleteFaculty(id: string) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to delete faculty");
-  }
-
-  return data;
-}
+export const updateFacultyPassword = (id: string, password: string) => request<{ message: string }>(`/faculty/${id}/password`, { method: "PATCH", body: JSON.stringify({ password }) });
+export const deleteFaculty = (id: string) => request<{ message: string }>(`/faculty/${id}`, { method: "DELETE" });

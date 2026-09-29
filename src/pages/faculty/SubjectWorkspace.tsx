@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Upload, Plus, Edit, Trash2, Search, FileText } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import { subjects, syllabus, courseOutcomes, questions } from "../../data/mock";
+import { subjects, syllabus, courseOutcomes, questions } from "../../data/runtime";
 import Badge from "../../components/ui/Badge";
 
 const tabs = ["Overview", "Syllabus", "Course Outcomes", "Program Outcomes", "Question Bank", "Previous Papers", "Generate Paper", "Paper History"];

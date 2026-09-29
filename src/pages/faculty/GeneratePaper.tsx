@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle, Circle, Loader, ArrowLeft, ArrowRight, AlertTriangle, Download, Send, Edit, RefreshCw, Trash2 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import { subjects, courseOutcomes, syllabus } from "../../data/mock";
+import { subjects, courseOutcomes, syllabus } from "../../data/runtime";
 import Badge from "../../components/ui/Badge";
 import { ConfirmDialog } from "../../components/ui/Modal";
 
@@ -38,12 +38,7 @@ function BloomBar({ label, pct, color }: { label: string; pct: number; color: st
   );
 }
 
-const GENERATED_QUESTIONS = [
-  { id: "g1", section: "A", no: 1, text: "Explain supervised learning with a suitable example.", marks: 5, co: "CO1", po: "PO1", bloom: "Understand", difficulty: "Easy" },
-  { id: "g2", section: "A", no: 2, text: "Differentiate between classification and regression techniques.", marks: 5, co: "CO2", po: "PO2", bloom: "Understand", difficulty: "Easy" },
-  { id: "g3", section: "B", no: 3, text: "Derive the cost function of linear regression. Explain gradient descent.", marks: 10, co: "CO2", po: "PO2", bloom: "Apply", difficulty: "Hard" },
-  { id: "g4", section: "B", no: 4, text: "Compare and contrast decision trees and random forests. When is each preferred?", marks: 10, co: "CO3", po: "PO3", bloom: "Analyze", difficulty: "Hard" },
-];
+const GENERATED_QUESTIONS: { id: string; section: string; no: number; text: string; marks: number; co: string; po: string; bloom: string; difficulty: string }[] = [];
 
 const GEN_STAGES = [
   "Preparing syllabus",
