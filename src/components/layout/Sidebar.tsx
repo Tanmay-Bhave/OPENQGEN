@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Users, BookOpen, Link, FileText, Database,
+  LayoutDashboard, Users, BookOpen, FileText, Database,
   Building2, Calendar, ClipboardList, Settings, LogOut,
   BookMarked, PenSquare, History, User, ChevronLeft, ChevronRight,
 } from "lucide-react";
@@ -11,7 +11,6 @@ const adminNav: { label: string; icon: React.ReactNode; page: Page }[] = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, page: "admin/dashboard" },
   { label: "Faculty Management", icon: <Users size={18} />, page: "admin/faculty" },
   { label: "Subject Management", icon: <BookOpen size={18} />, page: "admin/subjects" },
-  { label: "Course Assignments", icon: <Link size={18} />, page: "admin/assignments" },
   { label: "Question Papers", icon: <FileText size={18} />, page: "admin/papers" },
   { label: "Question Bank", icon: <Database size={18} />, page: "admin/question-bank" },
   { label: "Departments", icon: <Building2 size={18} />, page: "admin/settings" },

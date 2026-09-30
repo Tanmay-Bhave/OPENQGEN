@@ -5,7 +5,7 @@ const protect = async (req, res, next) => {
   try {
     // Get Authorization header
     const authHeader = req.headers.authorization;
-
+    console.log("Middleware")
     // Check if token exists
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({

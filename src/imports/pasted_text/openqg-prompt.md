@@ -76,7 +76,6 @@ The admin has complete authority over:
 • Faculty
 • Faculty credentials
 • Subjects
-• Course assignments
 • Departments
 • Semesters
 • Question papers
@@ -96,7 +95,6 @@ Sidebar:
 Dashboard
 Faculty Management
 Subject Management
-Course Assignments
 Question Papers
 Question Bank
 Departments
@@ -302,7 +300,6 @@ Cancel
 # ==================================================
 12. COURSE ASSIGNMENT
 Create a dedicated:
-"Course Assignments"
 page.
 This is where ADMIN assigns a subject/course to a particular faculty.
 Use a clean assignment interface.
@@ -860,7 +857,6 @@ ADMIN:
 Dashboard
 Faculty Management
 Subject Management
-Course Assignments
 Question Papers
 Question Bank
 Departments
@@ -1075,7 +1071,6 @@ Required screens:
 6. Faculty Credentials
 7. Subject Management
 8. Add Subject
-9. Course Assignment
 10. Assignment Management
 11. Admin Question Papers
 12. Admin Paper Review

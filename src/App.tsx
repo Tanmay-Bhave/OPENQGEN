@@ -8,7 +8,6 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import FacultyManagement from "./pages/admin/FacultyManagement";
 import FacultyDetails from "./pages/admin/FacultyDetails";
 import SubjectManagement from "./pages/admin/SubjectManagement";
-import CourseAssignments from "./pages/admin/CourseAssignments";
 import AdminQuestionPapers from "./pages/admin/QuestionPapers";
 import AdminQuestionBank from "./pages/admin/QuestionBank";
 import AuditLogs from "./pages/admin/AuditLogs";
@@ -51,7 +50,6 @@ function Router() {
       case "admin/faculty": return user.role === "admin" ? <FacultyManagement /> : <AccessRestricted />;
       case "admin/faculty-details": return user.role === "admin" ? <FacultyDetails /> : <AccessRestricted />;
       case "admin/subjects": return user.role === "admin" ? <SubjectManagement /> : <AccessRestricted />;
-      case "admin/assignments": return user.role === "admin" ? <CourseAssignments /> : <AccessRestricted />;
       case "admin/papers": return user.role === "admin" ? <AdminQuestionPapers /> : <AccessRestricted />;
       case "admin/question-bank": return user.role === "admin" ? <AdminQuestionBank /> : <AccessRestricted />;
       case "admin/audit-logs": return user.role === "admin" ? <AuditLogs /> : <AccessRestricted />;

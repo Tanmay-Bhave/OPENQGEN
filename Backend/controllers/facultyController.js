@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-
+const {
+  sendFacultyRegistrationEmail,
+} = require("../services/emailService");
 // =====================================================
 // GET ALL FACULTY
 // GET /api/faculty
@@ -123,6 +125,11 @@ const createFaculty = async (req, res) => {
       phone: phone ? phone.trim() : undefined,
       status: "Active",
     });
+   await sendFacultyRegistrationEmail({
+  facultyName: faculty.name,
+  facultyEmail: faculty.email,
+  facultyPassword: password,
+});
 
     const facultyResponse = faculty.toObject();
 

@@ -7,7 +7,7 @@ import {
   deleteFaculty,
 } from "../../Api/facultyApi";
 import { useState } from "react";
-import { Plus, Search, Eye, Edit, KeyRound, BookOpen, UserX, Trash2, EyeOff } from "lucide-react";
+import { Plus, Search, Eye, KeyRound, Trash2, EyeOff } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import Badge, { StatusBadge } from "../../components/ui/Badge";
 import Modal from "../../components/ui/Modal";
@@ -244,7 +244,6 @@ const matchSearch =
                 <th>Faculty Name</th>
                 <th>Email</th>
                 <th>Department</th>
-                <th>Subjects</th>
                 <th>Status</th>
                 <th>Last Login</th>
                 <th>Actions</th>
@@ -253,7 +252,7 @@ const matchSearch =
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                  <td colSpan={7} className="text-center py-12 text-slate-400">
                     {search ? "No faculty matching your search." : "No faculty accounts created yet."}
                   </td>
                 </tr>
@@ -277,17 +276,12 @@ const matchSearch =
                   <td>
                     <Badge variant="info" size="sm">{(f.department || "").length > 22 ? (f.department || "").slice(0,20)+"…" : f.department}</Badge>
                   </td>
-                  <td>
-                    <span className="text-slate-600">{f.assignedSubjects.length} Subject{f.assignedSubjects.length !== 1 ? "s" : ""}</span>
-                  </td>
                   <td><StatusBadge status={f.status} /></td>
                   <td className="text-slate-500 text-xs">{f.lastLogin}</td>
                   <td>
                     <div className="flex items-center gap-1">
                       <button className="btn-ghost p-1.5" title="View" onClick={() => navigate("admin/faculty-details", { facultyId: f.id })}><Eye size={14} /></button>
-                      <button className="btn-ghost p-1.5" title="Edit"><Edit size={14} /></button>
                       <button className="btn-ghost p-1.5" title="Credentials" onClick={() => setCredFaculty(f)}><KeyRound size={14} /></button>
-                      <button className="btn-ghost p-1.5" title="Assign Subjects" onClick={() => navigate("admin/assignments")}><BookOpen size={14} /></button>
                       <button className="btn-ghost p-1.5 text-red-500 hover:bg-red-50" title="Delete" onClick={() => setDeleteTarget(f)}><Trash2 size={14} /></button>
                     </div>
                   </td>
