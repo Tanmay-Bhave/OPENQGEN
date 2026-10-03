@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const AuditLog = require("../models/AuditLog");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -45,6 +46,23 @@ const login = async (req, res) => {
         message: "Invalid email or password",
       });
     }
+    // Save successful login in audit logs
+if (user.role === "faculty") {
+  await AuditLog.create({
+    userId: user._id,
+    user: user.name,
+    email: user.email,
+    facultyId: user.facultyId || "",
+    employeeCode: user.employeeCode || "",
+    department: user.department || "",
+    designation: user.designation || "",
+    role: user.role,
+    action: "Faculty Login",
+    module: "Authentication",
+    status: "Success",
+    timestamp: new Date(),
+  });
+}
 
     // Generate JWT
     const token = jwt.sign(

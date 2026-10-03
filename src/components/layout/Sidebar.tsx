@@ -1,7 +1,8 @@
 import {
-  LayoutDashboard, Users, BookOpen, FileText, Database,
-  Building2, Calendar, ClipboardList, Settings, LogOut,
+  LayoutDashboard, Users, BookOpen, Link, FileText, Database,
+  ClipboardList, Settings, LogOut,
   BookMarked, PenSquare, History, User, ChevronLeft, ChevronRight,
+  Calendar,
 } from "lucide-react";
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
@@ -13,10 +14,7 @@ const adminNav: { label: string; icon: React.ReactNode; page: Page }[] = [
   { label: "Subject Management", icon: <BookOpen size={18} />, page: "admin/subjects" },
   { label: "Question Papers", icon: <FileText size={18} />, page: "admin/papers" },
   { label: "Question Bank", icon: <Database size={18} />, page: "admin/question-bank" },
-  { label: "Departments", icon: <Building2 size={18} />, page: "admin/settings" },
-  { label: "Semesters", icon: <Calendar size={18} />, page: "admin/settings" },
   { label: "Audit Logs", icon: <ClipboardList size={18} />, page: "admin/audit-logs" },
-  { label: "Settings", icon: <Settings size={18} />, page: "admin/settings" },
 ];
 
 const facultyNav: { label: string; icon: React.ReactNode; page: Page }[] = [

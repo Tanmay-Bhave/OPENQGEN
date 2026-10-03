@@ -11,7 +11,6 @@ import SubjectManagement from "./pages/admin/SubjectManagement";
 import AdminQuestionPapers from "./pages/admin/QuestionPapers";
 import AdminQuestionBank from "./pages/admin/QuestionBank";
 import AuditLogs from "./pages/admin/AuditLogs";
-import Settings from "./pages/admin/Settings";
 import FacultyDashboard from "./pages/faculty/Dashboard";
 import MySubjects from "./pages/faculty/MySubjects";
 import SubjectWorkspace from "./pages/faculty/SubjectWorkspace";
@@ -27,7 +26,7 @@ function AccessRestricted() {
         <span className="text-3xl">🚫</span>
       </div>
       <h2 className="font-display text-2xl font-700 text-slate-900 mb-2">Access Restricted</h2>
-      <p className="text-slate-500 mb-6">You do not have permission to access this page.</p>
+      <p className="text-slate-500Settings mb-6">You do not have permission to access this page.</p>
       <button
         className="btn-primary"
         onClick={() => navigate(user?.role === "admin" ? "admin/dashboard" : "faculty/dashboard")}
@@ -53,7 +52,6 @@ function Router() {
       case "admin/papers": return user.role === "admin" ? <AdminQuestionPapers /> : <AccessRestricted />;
       case "admin/question-bank": return user.role === "admin" ? <AdminQuestionBank /> : <AccessRestricted />;
       case "admin/audit-logs": return user.role === "admin" ? <AuditLogs /> : <AccessRestricted />;
-      case "admin/settings": return user.role === "admin" ? <Settings /> : <AccessRestricted />;
 
       // Faculty pages
       case "faculty/dashboard": return user.role === "faculty" ? <FacultyDashboard /> : <AccessRestricted />;

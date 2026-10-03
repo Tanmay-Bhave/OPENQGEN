@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const questionRoutes = require("./routes/questionRoutes");
+const auditLogRoutes = require("./routes/auditLogRoutes");
 dotenv.config();
 
 const app = express();
@@ -24,7 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/questions", questionRoutes);
-
+app.use("/api/audit-logs", auditLogRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.json({

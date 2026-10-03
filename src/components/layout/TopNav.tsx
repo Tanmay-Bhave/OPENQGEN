@@ -1,19 +1,31 @@
-import { Bell, ChevronDown, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Moon, Sun, Shield, ChevronDown } from "lucide-react";
+
 import { useApp } from "../../context/AppContext";
 
 export default function TopNav() {
   const { user, logout } = useApp();
   const [open, setOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+  return localStorage.getItem("theme") === "dark";
+});
+
+useEffect(() => {
+  document.documentElement.classList.toggle("dark", darkMode);
+  localStorage.setItem("theme", darkMode ? "dark" : "light");
+}, [darkMode]);
 
   return (
     <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-10">
       <div />
       <div className="flex items-center gap-3">
-        <button className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 relative">
-          <Bell size={17} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-        </button>
+       <button
+  onClick={() => setDarkMode(!darkMode)}
+  className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+  title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+>
+  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+</button>
 
         <div className="relative">
           <button
